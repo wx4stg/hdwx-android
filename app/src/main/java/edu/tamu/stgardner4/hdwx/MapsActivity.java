@@ -1,15 +1,36 @@
 package edu.tamu.stgardner4.hdwx;
 
-import androidx.fragment.app.FragmentActivity;
-
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
+
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2.Error;
+import com.tonyodev.fetch2.Fetch;
+import com.tonyodev.fetch2.FetchConfiguration;
+import com.tonyodev.fetch2.FetchListener;
+import com.tonyodev.fetch2.NetworkType;
+import com.tonyodev.fetch2.Priority;
+import com.tonyodev.fetch2.Request;
+import com.tonyodev.fetch2core.DownloadBlock;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.util.List;
 
 import edu.tamu.stgardner4.hdwx.databinding.ActivityMapsBinding;
 
@@ -17,6 +38,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+    private Fetch fetch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +65,120 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        /*
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        */
+
+        FetchConfiguration config = new FetchConfiguration.Builder(this).setDownloadConcurrentLimit(10).build();
+        fetch = Fetch.Impl.getInstance(config);
+        final Request request =  new Request("http://weather-dev.geos.tamu.edu/wx4stg/test.png", getFilesDir() + File.separator + "test.png");
+        request.setPriority(Priority.HIGH);
+        request.setNetworkType(NetworkType.ALL);
+
+        FetchListener listener = new FetchListener() {
+            @Override
+            public void onAdded(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Successfully added.");
+            }
+
+            @Override
+            public void onQueued(@NotNull Download download, boolean b) {
+                Log.d("HDWX-DEBUG", "Successfully queued.");
+            }
+
+            @Override
+            public void onWaitingNetwork(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Waiting network.");
+            }
+
+            @Override
+            public void onCompleted(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Download complete!");
+                LatLng southWestLL = new LatLng(23.5,-110);
+                LatLng northEastLL = new LatLng(37,-85);
+                LatLngBounds bounds = new LatLngBounds(southWestLL, northEastLL);
+                Bitmap imageBitmap = BitmapFactory.decodeFile(download.getFile());
+                BitmapDescriptor img = BitmapDescriptorFactory.fromBitmap(imageBitmap);
+                GroundOverlayOptions gndOverlay = new GroundOverlayOptions().image(img).positionFromBounds(bounds);
+                mMap.addGroundOverlay(gndOverlay);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(northEastLL));
+            }
+
+            @Override
+            public void onError(@NotNull Download download, @NotNull Error error, @Nullable Throwable throwable) {
+                Log.d("HDWX-DEBUG", throwable.toString());
+            }
+
+            @Override
+            public void onDownloadBlockUpdated(@NotNull Download download, @NotNull DownloadBlock downloadBlock, int i) {
+                Log.d("HDWX-DEBUG", "Block updated.");
+            }
+
+            @Override
+            public void onStarted(@NotNull Download download, @NotNull List<? extends DownloadBlock> list, int i) {
+                Log.d("HDWX-DEBUG", "Successfully started.");
+            }
+
+            @Override
+            public void onProgress(@NotNull Download download, long l, long l1) {
+                Log.d("HDWX-DEBUG", "Progress" + l + l1);
+            }
+
+            @Override
+            public void onPaused(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Paused.");
+            }
+
+            @Override
+            public void onResumed(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Resumed.");
+            }
+
+            @Override
+            public void onCancelled(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Cancelled.");
+            }
+
+            @Override
+            public void onRemoved(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Removed.");
+            }
+
+            @Override
+            public void onDeleted(@NotNull Download download) {
+                Log.d("HDWX-DEBUG", "Deleted.");
+            }
+        };
+        fetch.addListener(listener);
+        fetch.enqueue(request, updatedRequest -> {
+            Log.d("HDWX-DEBUG", "Successfully enqueued.");
+        }, error -> {
+            Log.d("HDWX-DEBUG", error.getThrowable().toString());
+        });
+        /*
+        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri targetURI = Uri.parse("https:/weather-dev.geos.tamu.edu/wx4stg/test.png");
+
+        DownloadManager.Request request = new DownloadManager.Request(targetURI);
+        request.setTitle("Radar Test File");
+        request.setDescription("Downloading file...");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setVisibleInDownloadsUi(false);
+        Log.d("HDWX-DEBUG", Environment.DIRECTORY_DOWNLOADS);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "test.png");
+        //request.setDestinationUri(Uri.parse("file://" + getApplicationContext().getFilesDir().getAbsolutePath() + File.separator +"test.png"));
+        BroadcastReceiver downloadCompletionHandler = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d("HDWX-DEBUG", "Download complete.");
+
+            }
+        };
+        registerReceiver(downloadCompletionHandler, new IntentFilter(manager.ACTION_DOWNLOAD_COMPLETE));
+        manager.enqueue(request);
+        */
     }
 }
