@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,7 +36,7 @@ import java.util.List;
 
 import edu.tamu.stgardner4.hdwx.databinding.ActivityMapsBinding;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -51,6 +53,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
     }
 
     /**
@@ -65,19 +69,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        /*
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        */
-
         FetchConfiguration config = new FetchConfiguration.Builder(this).setDownloadConcurrentLimit(10).build();
         fetch = Fetch.Impl.getInstance(config);
+        File frame9File = new File(getFilesDir() + File.separator + "test.png");
+        if (frame9File.exists()) {
+            Log.d("HDWX-DEBUG", "Removing file...");
+            frame9File.delete();
+        }
         final Request request =  new Request("http://weather-dev.geos.tamu.edu/wx4stg/test.png", getFilesDir() + File.separator + "test.png");
         request.setPriority(Priority.HIGH);
         request.setNetworkType(NetworkType.ALL);
-
         FetchListener listener = new FetchListener() {
             @Override
             public void onAdded(@NotNull Download download) {
@@ -158,27 +159,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }, error -> {
             Log.d("HDWX-DEBUG", error.getThrowable().toString());
         });
-        /*
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        Uri targetURI = Uri.parse("https:/weather-dev.geos.tamu.edu/wx4stg/test.png");
-
-        DownloadManager.Request request = new DownloadManager.Request(targetURI);
-        request.setTitle("Radar Test File");
-        request.setDescription("Downloading file...");
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setVisibleInDownloadsUi(false);
-        Log.d("HDWX-DEBUG", Environment.DIRECTORY_DOWNLOADS);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "test.png");
-        //request.setDestinationUri(Uri.parse("file://" + getApplicationContext().getFilesDir().getAbsolutePath() + File.separator +"test.png"));
-        BroadcastReceiver downloadCompletionHandler = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d("HDWX-DEBUG", "Download complete.");
-
-            }
-        };
-        registerReceiver(downloadCompletionHandler, new IntentFilter(manager.ACTION_DOWNLOAD_COMPLETE));
-        manager.enqueue(request);
-        */
     }
 }
