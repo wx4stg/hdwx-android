@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">HDWX</string>
     <string name="title_activity_maps">HDWX</string>
+    <string name="road">Street</string>
+    <string name="satellite">Satellite</string>
+    <string name="terrain">Terrain</string>
 </resources>
