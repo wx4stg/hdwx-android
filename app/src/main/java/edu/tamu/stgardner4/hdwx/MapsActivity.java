@@ -162,6 +162,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.setMyLocationEnabled(true);
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 7.0f));
         }
+        mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+            @Override
+            public void onCameraMoveStarted(int reason) {
+                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                    LinearLayout mapAttrLayout = findViewById(R.id.mapAttrLayout);
+                    mapAttrLayout.setVisibility(View.INVISIBLE);
+                    isTracking = Boolean.FALSE;
+                }
+            }
+        });
         FetchConfiguration config = new FetchConfiguration.Builder(this).setDownloadConcurrentLimit(10).build();
         fetch = Fetch.Impl.getInstance(config);
         File frame9File = new File(getFilesDir() + File.separator + "test.png");
