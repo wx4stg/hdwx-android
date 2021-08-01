@@ -1,6 +1,9 @@
 package edu.tamu.stgardner4.hdwx;
 
 import android.Manifest;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -48,62 +51,62 @@ import java.util.List;
 
 import edu.tamu.stgardner4.hdwx.databinding.ActivityMapsBinding;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
-    private Fetch fetch;
     private Boolean isTracking = Boolean.FALSE;
+    private Boolean isMapAttrLayoutExpanded = Boolean.FALSE;
     private final int preciseLocationCode = 1;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        context = getApplicationContext();
         setContentView(binding.getRoot());
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
         LinearLayout mapAttrLayout = findViewById(R.id.mapAttrLayout);
         mapAttrLayout.setVisibility(View.INVISIBLE);
+        //mapAttrLayout.animate().translationY(-1*mapAttrLayout.getHeight()).setDuration(1/10000);
         ImageButton mapAttrBtn = findViewById(R.id.mapAttrBtn);
-        mapAttrBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mapAttrLayout.getVisibility() == View.INVISIBLE) {
-                    mapAttrLayout.setVisibility(View.VISIBLE);
-                } else {
-                    mapAttrLayout.setVisibility(View.INVISIBLE);
-                }
+        mapAttrBtn.setOnClickListener(v -> {
+            if (isMapAttrLayoutExpanded) {
+                mapAttrLayout.animate().translationY(-1*mapAttrLayout.getHeight());
+                isMapAttrLayoutExpanded = Boolean.FALSE;
+            } else {
+                mapAttrLayout.setVisibility(View.VISIBLE);
+                mapAttrLayout.animate().translationY(0);
+                isMapAttrLayoutExpanded = Boolean.TRUE;
             }
         });
         MaterialButton streetBtn = findViewById(R.id.streetBtn);
-        streetBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                mapAttrLayout.setVisibility(View.INVISIBLE);
-            }
+        streetBtn.setOnClickListener(v -> {
+            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            mapAttrLayout.animate().translationY(-1*mapAttrLayout.getHeight());
+            isMapAttrLayoutExpanded = Boolean.FALSE;
         });
         MaterialButton satBtn = findViewById(R.id.satBtn);
-        satBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                mapAttrLayout.setVisibility(View.INVISIBLE);
-            }
+        satBtn.setOnClickListener(v -> {
+            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+            mapAttrLayout.animate().translationY(-1*mapAttrLayout.getHeight());
+            isMapAttrLayoutExpanded = Boolean.FALSE;
         });
         MaterialButton terrBtn = findViewById(R.id.terrBtn);
-        terrBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                mapAttrLayout.setVisibility(View.INVISIBLE);
-            }
+        terrBtn.setOnClickListener(v -> {
+            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+            mapAttrLayout.animate().translationY(-1*mapAttrLayout.getHeight());
+            isMapAttrLayoutExpanded = Boolean.FALSE;
         });
         ImageButton locateBtn = findViewById(R.id.locateBtn);
         locateBtn.setBackgroundColor(getResources().getColor(R.color.aggie_maroon));
@@ -113,15 +116,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 if (isTracking) {
                     isTracking = Boolean.FALSE;
+                    ObjectAnimator bgColorFade = ObjectAnimator.ofObject(locateBtn, "backgroundColor", new ArgbEvaluator(), Color.argb(255,255,255,255), getResources().getColor(R.color.aggie_maroon));
+                    ObjectAnimator fgColorFade = ObjectAnimator.ofObject(locateBtn, "colorFilter", new ArgbEvaluator(), getResources().getColor(R.color.aggie_maroon), Color.argb(255,255,255,255));
+                    bgColorFade.start();
+                    fgColorFade.start();
                 } else {
-                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        Toast myToast = Toast.makeText(getApplicationContext(), "To follow your location, go to the settings app and give HDWX permission to view your location. This data is not stored by HDWX.", Toast.LENGTH_LONG);
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast myToast = Toast.makeText(context, "To follow your location, go to the settings app and give HDWX permission to view your location. This data is not stored by HDWX.", Toast.LENGTH_LONG);
                         myToast.show();
                     } else {
                         isTracking = Boolean.TRUE;
-                        locateBtn.setBackgroundColor(getResources().getColor(R.color.white));
-                        locateBtn.setColorFilter(Color.argb(255, 50, 50, 50));
-                        LocationManager lm = (LocationManager) getSystemService(getApplicationContext().LOCATION_SERVICE);
+                        ObjectAnimator bgColorFade = ObjectAnimator.ofObject(locateBtn, "backgroundColor", new ArgbEvaluator(), getResources().getColor(R.color.aggie_maroon), Color.argb(255,255,255,255));
+                        ObjectAnimator fgColorFade = ObjectAnimator.ofObject(locateBtn, "colorFilter", new ArgbEvaluator(), Color.argb(255,255,255,255), getResources().getColor(R.color.aggie_maroon));
+                        bgColorFade.start();
+                        fgColorFade.start();
+                        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
                         Location lmlocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         LatLng userLocation = new LatLng(lmlocation.getLatitude(), lmlocation.getLongitude());
                         mMap.setMyLocationEnabled(true);
@@ -129,51 +138,56 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, new LocationListener() {
                             @Override
                             public void onLocationChanged(@NonNull Location location) {
-                                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                     if (isTracking) {
                                         Location lmlocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                                         LatLng userLocation = new LatLng(lmlocation.getLatitude(), lmlocation.getLongitude());
                                         mMap.setMyLocationEnabled(true);
                                         mMap.animateCamera(CameraUpdateFactory.newLatLng(userLocation));
                                     } else {
-                                        locateBtn.setBackgroundColor(getResources().getColor(R.color.aggie_maroon));
-                                        locateBtn.setColorFilter(Color.argb(255, 255, 255, 255));
-                                        lm.removeUpdates(this::onLocationChanged);
+                                        lm.removeUpdates(this);
                                     }
                                 }
                             }
                         });
                     }
                 }
-                mapAttrLayout.setVisibility(View.INVISIBLE);
+                mapAttrLayout.animate().translationY(-1*mapAttrLayout.getHeight());
+                isMapAttrLayoutExpanded = Boolean.FALSE;
             }
         });
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, preciseLocationCode);
         } else {
-            LocationManager lm = (LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
+            LocationManager lm = (LocationManager)getSystemService(LOCATION_SERVICE);
             Location lmlocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             LatLng userLocation = new LatLng(lmlocation.getLatitude(), lmlocation.getLongitude());
             mMap.setMyLocationEnabled(true);
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 7.0f));
         }
-        mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
-            @Override
-            public void onCameraMoveStarted(int reason) {
-                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                    LinearLayout mapAttrLayout = findViewById(R.id.mapAttrLayout);
-                    mapAttrLayout.setVisibility(View.INVISIBLE);
+        mMap.setOnCameraMoveStartedListener(reason -> {
+            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                LinearLayout mapAttrLayout = findViewById(R.id.mapAttrLayout);
+                mapAttrLayout.animate().translationY(-1*mapAttrLayout.getHeight());
+                isMapAttrLayoutExpanded = Boolean.FALSE;
+                if (isTracking) {
                     isTracking = Boolean.FALSE;
+                    ImageButton locateBtn = findViewById(R.id.locateBtn);
+                    ObjectAnimator bgColorFade = ObjectAnimator.ofObject(locateBtn, "backgroundColor", new ArgbEvaluator(), Color.argb(255,255,255,255), getResources().getColor(R.color.aggie_maroon));
+                    ObjectAnimator fgColorFade = ObjectAnimator.ofObject(locateBtn, "colorFilter", new ArgbEvaluator(), getResources().getColor(R.color.aggie_maroon), Color.argb(255,255,255,255));
+                    bgColorFade.start();
+                    fgColorFade.start();
                 }
+
             }
         });
         FetchConfiguration config = new FetchConfiguration.Builder(this).setDownloadConcurrentLimit(10).build();
-        fetch = Fetch.Impl.getInstance(config);
+        Fetch fetch = Fetch.Impl.getInstance(config);
         File frame9File = new File(getFilesDir() + File.separator + "test.png");
         if (frame9File.exists()) {
             frame9File.delete();
@@ -232,7 +246,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == preciseLocationCode) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                LocationManager lm = (LocationManager) getSystemService(getApplicationContext().LOCATION_SERVICE);
+                LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
                 Location lmlocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 LatLng userLocation = new LatLng(lmlocation.getLatitude(), lmlocation.getLongitude());
                 mMap.setMyLocationEnabled(true);

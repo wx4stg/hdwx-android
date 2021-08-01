@@ -4,4 +4,6 @@
     <string name="road">Street</string>
     <string name="satellite">Satellite</string>
     <string name="terrain">Terrain</string>
+    <string name="follow_user_location">Follow user location</string>
+    <string name="map_options">Map options</string>
 </resources>

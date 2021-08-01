@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -15,13 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/aggie_secondary">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:translationX="5dp"
-            map:icon="@android:drawable/ic_menu_mylocation"/>
-    </LinearLayout>
+        android:background="@color/aggie_secondary"/>
     <LinearLayout
         android:id="@+id/mapAttrLayout"
         android:layout_width="match_parent"
@@ -73,15 +66,15 @@
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_marginEnd="150dp"
+        android:layout_marginEnd="125dp"
         android:background="?attr/colorPrimary"
         android:gravity="center_vertical|start"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         map:logo="@drawable/atmo_banner"
-        map:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        map:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <LinearLayout
-        android:layout_width="150dp"
+        android:layout_width="125dp"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentEnd="true"
         android:background="@color/aggie_maroon">
@@ -92,7 +85,8 @@
             android:layout_gravity="start"
             android:layout_weight="1"
             android:background="@color/aggie_maroon"
-            android:src="@android:drawable/ic_menu_mylocation" />
+            android:src="@android:drawable/ic_menu_mylocation"
+            android:contentDescription="@string/follow_user_location"/>
         <ImageButton
             android:id="@+id/mapAttrBtn"
             android:layout_width="0dp"
@@ -100,6 +94,7 @@
             android:layout_gravity="end"
             android:layout_weight="1"
             android:background="@color/aggie_maroon"
-            android:src="@android:drawable/ic_menu_mapmode" />
+            android:src="@android:drawable/ic_menu_mapmode"
+            android:contentDescription="@string/map_options"/>
     </LinearLayout>
 </RelativeLayout>
