@@ -111,12 +111,14 @@ public class FetchActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                     Intent mapsActInt = new Intent(FetchActivity.this, MapsActivity.class);
                                     startActivity(mapsActInt);
+                                    finish();
                                 }
                             });
                     alertDialog.show();
                 } else {
                     Intent mapsActInt = new Intent(FetchActivity.this, MapsActivity.class);
                     startActivity(mapsActInt);
+                    finish();
                 }
             }
             @Override
@@ -133,7 +135,19 @@ public class FetchActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NotNull Download download, @NotNull Error error, @Nullable Throwable throwable) {
-                Log.w("HDWX-WARNING", "Download failed");
+                AlertDialog alertDialog = new AlertDialog.Builder(FetchActivity.this, R.style.AlertDialogCustom).create();
+                alertDialog.setTitle("Fetching Product List Failed");
+                alertDialog.setMessage("This probably means you don't have internet or HDWX is down. Products may not work as expected (or at all).");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "DISMISS",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                Intent mapsActInt = new Intent(FetchActivity.this, MapsActivity.class);
+                                startActivity(mapsActInt);
+                                finish();
+                            }
+                        });
+                alertDialog.show();
             }
 
             @Override

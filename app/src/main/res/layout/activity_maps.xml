@@ -4,97 +4,119 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MapsActivity" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/aggie_secondary"/>
-    <LinearLayout
-        android:id="@+id/mapAttrLayout"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_below="@+id/my_toolbar"
-        android:background="@color/aggie_secondary">
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/streetBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:layout_weight="20"
-            android:background="@color/aggie_maroon"
-            android:text="@string/road" />
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:layout_weight="1"/>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/satBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:layout_weight="20"
-            android:text="@string/satellite"
-            android:background="@color/aggie_maroon"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:layout_weight="1"/>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/terrBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:layout_weight="20"
-            android:text="@string/terrain"
-            android:background="@color/aggie_maroon"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_weight="1"/>
-    </LinearLayout>
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/my_toolbar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_marginEnd="125dp"
-        android:background="?attr/colorPrimary"
-        android:gravity="center_vertical|start"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        map:logo="@drawable/atmo_banner"
-        map:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="125dp"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentEnd="true"
-        android:background="@color/aggie_maroon">
-        <ImageButton
-            android:id="@+id/locateBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:layout_weight="1"
-            android:background="@color/aggie_maroon"
-            android:src="@android:drawable/ic_menu_mylocation"
-            android:contentDescription="@string/follow_user_location"/>
-        <ImageButton
-            android:id="@+id/mapAttrBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_weight="1"
-            android:background="@color/aggie_maroon"
-            android:src="@android:drawable/ic_menu_mapmode"
-            android:contentDescription="@string/map_options"/>
-    </LinearLayout>
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/bottomLinearLayout"
+            android:layout_below="@+id/my_toolbar"
+            tools:context=".MapsActivity" />
+
+        <LinearLayout
+            android:id="@+id/bottomLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:background="@color/aggie_secondary"
+            android:orientation="horizontal" />
+
+        <LinearLayout
+            android:id="@+id/mapAttrLayout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:background="@color/aggie_secondary">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/streetBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_weight="20"
+                android:background="@color/aggie_maroon"
+                android:text="@string/road" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/satBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_weight="20"
+                android:background="@color/aggie_maroon"
+                android:text="@string/satellite" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/terrBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_weight="20"
+                android:background="@color/aggie_maroon"
+                android:text="@string/terrain" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="125dp"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentEnd="true"
+            android:background="@color/aggie_maroon">
+
+            <ImageButton
+                android:id="@+id/mapAttrBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:background="@color/aggie_maroon"
+                android:contentDescription="@string/map_options"
+                android:src="@android:drawable/ic_menu_mapmode" />
+
+            <ImageButton
+                android:id="@+id/exportBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:background="@color/aggie_maroon"
+                android:contentDescription="@string/map_options"
+                android:src="@android:drawable/ic_menu_share" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/my_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginEnd="125dp"
+            android:background="?attr/colorPrimary"
+            android:gravity="center_vertical|start"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            map:logo="@drawable/atmo_banner"
+            map:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    </RelativeLayout>
+
 </RelativeLayout>

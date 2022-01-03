@@ -6,4 +6,5 @@
     <string name="terrain">Terrain</string>
     <string name="follow_user_location">Follow user location</string>
     <string name="map_options">Map options</string>
+    <string name="share_content">Share content</string>
 </resources>
